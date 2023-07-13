@@ -20,14 +20,14 @@ class LocalSearchService(
         val naverLocalRequest = localSearchConverter.convertToNaver(request)
         val naverResponse = naverLocalService.searchPlaceByNaverApi(naverLocalRequest)
 
-        if(kakaoResponse == null && naverResponse == null) return listOf()
+        if(kakaoResponse == null && naverResponse == null) return emptyList()
 
         val kakaoLocalSearchResponse = localSearchConverter.convertFromKakao(kakaoResponse)
         val naverLocalSearchResponse = localSearchConverter.convertFromNaver(naverResponse)
 
         val unionList = kakaoLocalSearchResponse.intersect(naverLocalSearchResponse).toList()
-        val aSub = kakaoLocalSearchResponse.subtract(naverLocalSearchResponse).toList()
-        val bSub = naverLocalSearchResponse.subtract(kakaoLocalSearchResponse).toList()
+        val aSub = kakaoLocalSearchResponse.minus(naverLocalSearchResponse).toList()
+        val bSub = naverLocalSearchResponse.minus(kakaoLocalSearchResponse).toList()
 
         return unionList + aSub + bSub
     }

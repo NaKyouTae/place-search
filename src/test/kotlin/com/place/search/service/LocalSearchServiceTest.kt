@@ -50,7 +50,6 @@ class LocalSearchServiceTest: AbstractServiceTest() {
 
                 Then("공통 장소, 카카오 장소, 네이버 장소 순서로 리스트 반황") {
                     places shouldBe listOf("카카오뱅크", "국민은행", "부산은행", "우리은행", "새마을금고", "하나은행", "기업은행")
-                    println("====== ${places}")
                 }
             }
         }
