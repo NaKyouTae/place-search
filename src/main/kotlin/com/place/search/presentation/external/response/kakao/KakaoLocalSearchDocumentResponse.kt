@@ -1,6 +1,6 @@
-package com.place.search.presentation.external.response
+package com.place.search.presentation.external.response.kakao
 
-data class LocalSearchDocumentResponse(
+data class KakaoLocalSearchDocumentResponse(
     // 장소 ID
     val id:String, 
     

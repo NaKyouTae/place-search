@@ -16,12 +16,12 @@ class LocalSearchController(
 ) {
 
     @PostMapping
-    fun searchLocalByKeyword(@RequestBody request: LocalSearchRequest): CommonResponse<List<LocalSearchResponse>> {
-        val locations = localSearchService.searchLocalByKeyword(request)
+    fun searchLocalByKeyword(@RequestBody request: LocalSearchRequest): CommonResponse<LocalSearchResponse> {
+        val places = localSearchService.searchLocalByKeyword(request)
         return CommonResponse(
             isSuccess = true,
             message = "Success Location List Search !!",
-            result = locations.map { LocalSearchResponse(it) }
+            result = LocalSearchResponse(places)
         )
     }
 }

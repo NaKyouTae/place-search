@@ -1,42 +1,46 @@
 package com.place.search.presentation.external.service
 
 import com.fasterxml.jackson.databind.ObjectMapper
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
+import com.fasterxml.jackson.module.kotlin.registerKotlinModule
 import com.place.search.configuration.CommonException
-import com.place.search.presentation.external.KakaoProperties
+import com.place.search.presentation.external.NaverProperties
 import com.place.search.presentation.external.request.KakaoLocalSearchRequest
-import com.place.search.presentation.external.response.kakao.KakaoApiResponse
-import com.place.search.presentation.external.response.kakao.KakaoLocalSearchDocumentResponse
+import com.place.search.presentation.external.request.NaverLocalSearchRequest
 import com.place.search.presentation.external.response.naver.NaverLocalSearchResponse
 import org.slf4j.LoggerFactory
-import org.springframework.core.ParameterizedTypeReference
 import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Service
 import org.springframework.web.reactive.function.client.WebClient
+import org.springframework.web.util.UriComponentsBuilder
 import reactor.core.publisher.Mono
 import java.lang.StringBuilder
 
 @Service
-class KakaoLocalService(
+class NaverLocalService(
     private val objectMapper: ObjectMapper,
-    private val properties: KakaoProperties,
+    private val properties: NaverProperties,
     private val webClientBuilder: WebClient.Builder,
 ) {
     private val logger = LoggerFactory.getLogger(this::class.java)
 
-    fun searchPlaceByKakaoApi(request: KakaoLocalSearchRequest): KakaoApiResponse<KakaoLocalSearchDocumentResponse> {
+    fun searchPlaceByNaverApi(request: NaverLocalSearchRequest): NaverLocalSearchResponse {
         val uri = createLocalSearchUri(request)
         val res = webClientBuilder.build()
             .get()
             .uri(uri)
-            .header("Authorization", "KakaoAK ${properties.key}")
+            .headers {
+                it.add("X-Naver-Client-Id", properties.id)
+                it.add("X-Naver-Client-Secret", properties.secret)
+            }
             .retrieve()
-            .onStatus({ it.isError }) { response ->
+            .onStatus({it.isError}) { response ->
                 response.bodyToMono(String::class.java).subscribe { errStr ->
-                    logger.error("[KAKAO API] Local Search errStr = $errStr")
+                    logger.error("[NAVER API] Local Search errStr = $errStr")
                 }
                 Mono.error(
                     CommonException(
-                        "[KAKAO API] Local Search 중 에러가 발생했습니다",
+                        "[NAVER API] Local Search 중 에러가 발생했습니다",
                         HttpStatus.INTERNAL_SERVER_ERROR
                     )
                 )
@@ -44,27 +48,21 @@ class KakaoLocalService(
             .bodyToMono(String::class.java)
             .block()
 
-        return objectMapper.readValue(
-            res,
-            objectMapper.typeFactory.constructParametricType(
-                KakaoApiResponse::class.java,
-                KakaoLocalSearchDocumentResponse::class.java
-            )
-        )
+        return objectMapper.readValue(res, NaverLocalSearchResponse::class.java)
     }
 
-    private fun createLocalSearchUri(request: KakaoLocalSearchRequest): String {
+    private fun createLocalSearchUri(request: NaverLocalSearchRequest): String {
         val uri = StringBuilder()
 
         uri.append(properties.baseUrl + LOCAL_SEARCH_END_POINT)
         uri.append("?query=", request.query)
-        uri.append("&page=", request.page)
-        uri.append("&size=", request.size)
+        uri.append("&display=", request.display)
+        uri.append("&start=", request.start)
 
         return uri.toString()
     }
 
     companion object {
-        const val LOCAL_SEARCH_END_POINT = "/v2/local/search/keyword.json"
+        const val LOCAL_SEARCH_END_POINT = "/v1/search/local.json"
     }
 }

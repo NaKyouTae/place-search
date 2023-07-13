@@ -34,6 +34,6 @@ class APIAuthFilter: OncePerRequestFilter() {
     }
 
     companion object {
-        const val ACCESS_TOKEN = ""
+        const val ACCESS_TOKEN = "kb-it-compliance-test"
     }
 }

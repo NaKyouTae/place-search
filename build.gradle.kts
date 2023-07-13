@@ -8,8 +8,9 @@ plugins {
 	kotlin("plugin.jpa") version "1.8.22"
 }
 
-group = "com.place"
-version = "0.0.1-SNAPSHOT"
+val group = "com.place"
+val version = "0.0.1-SNAPSHOT"
+val kotestVersion = "5.6.2"
 
 java {
 	sourceCompatibility = JavaVersion.VERSION_17
@@ -34,12 +35,20 @@ dependencies {
 	implementation("io.projectreactor.kotlin:reactor-kotlin-extensions")
 	implementation("org.jetbrains.kotlin:kotlin-reflect")
 	implementation("org.jetbrains.kotlinx:kotlinx-coroutines-reactor")
-	compileOnly("org.projectlombok:lombok")
 	implementation("com.h2database:h2")
+	implementation("io.insert-koin:koin-core:3.4.2")
+
+	compileOnly("org.projectlombok:lombok")
+
 	annotationProcessor("org.projectlombok:lombok")
+
 	testImplementation("org.springframework.boot:spring-boot-starter-test")
 	testImplementation("io.projectreactor:reactor-test")
 	testImplementation("org.springframework.security:spring-security-test")
+	testImplementation("io.kotest:kotest-runner-junit5:$kotestVersion")
+	testImplementation("io.kotest:kotest-assertions-core:$kotestVersion")
+	testImplementation("io.insert-koin:koin-test:3.4.1")
+	testImplementation("io.mockk:mockk:1.12.4")
 }
 
 tasks.withType<KotlinCompile> {

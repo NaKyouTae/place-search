@@ -1,6 +1,6 @@
-package com.place.search.presentation.external.response
+package com.place.search.presentation.external.response.kakao
 
-data class SameNameResponse(
+data class KakaoSameNameResponse(
     // 질의어에서 인식된 지역의 리스트
     // (예: '중앙로 맛집' 에서 '중앙로'에 해당하는 지역 리스트)
     val region: List<String>,

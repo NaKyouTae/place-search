@@ -1,6 +1,6 @@
-package com.place.search.presentation.external.response
+package com.place.search.presentation.external.response.kakao
 
-data class MetaResponse(
+data class KakaoMetaResponse(
     // 검색된 문서 수
     val total_count: Long,
 
@@ -12,5 +12,5 @@ data class MetaResponse(
     val is_end: Boolean,
 
     // 질의어의 지역 및 키워드 분석 정보
-    val same_name: SameNameResponse
+    val same_name: KakaoSameNameResponse
 )
