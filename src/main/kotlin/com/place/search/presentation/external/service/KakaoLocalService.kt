@@ -6,9 +6,7 @@ import com.place.search.presentation.external.KakaoProperties
 import com.place.search.presentation.external.request.KakaoLocalSearchRequest
 import com.place.search.presentation.external.response.kakao.KakaoApiResponse
 import com.place.search.presentation.external.response.kakao.KakaoLocalSearchDocumentResponse
-import com.place.search.presentation.external.response.naver.NaverLocalSearchResponse
 import org.slf4j.LoggerFactory
-import org.springframework.core.ParameterizedTypeReference
 import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Service
 import org.springframework.web.reactive.function.client.WebClient

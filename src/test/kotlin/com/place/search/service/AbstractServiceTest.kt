@@ -1,6 +1,5 @@
 package com.place.search.service
 
-import com.fasterxml.jackson.module.kotlin.kotlinModule
 import com.place.search.applications.LocalSearchService
 import com.place.search.applications.SearchHistoryService
 import com.place.search.domain.converter.LocalSearchConverter
@@ -12,7 +11,6 @@ import io.mockk.mockk
 import org.koin.core.context.startKoin
 import org.koin.core.module.dsl.singleOf
 import org.koin.dsl.module
-import org.koin.dsl.single
 import org.koin.test.KoinTest
 
 abstract class AbstractServiceTest: KoinTest, BehaviorSpec({

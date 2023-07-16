@@ -1,18 +1,14 @@
 package com.place.search.presentation.external.service
 
 import com.fasterxml.jackson.databind.ObjectMapper
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
-import com.fasterxml.jackson.module.kotlin.registerKotlinModule
 import com.place.search.configuration.CommonException
 import com.place.search.presentation.external.NaverProperties
-import com.place.search.presentation.external.request.KakaoLocalSearchRequest
 import com.place.search.presentation.external.request.NaverLocalSearchRequest
 import com.place.search.presentation.external.response.naver.NaverLocalSearchResponse
 import org.slf4j.LoggerFactory
 import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Service
 import org.springframework.web.reactive.function.client.WebClient
-import org.springframework.web.util.UriComponentsBuilder
 import reactor.core.publisher.Mono
 import java.lang.StringBuilder
 
