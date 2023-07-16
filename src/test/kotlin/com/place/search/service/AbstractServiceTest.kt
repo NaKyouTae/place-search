@@ -2,7 +2,9 @@ package com.place.search.service
 
 import com.fasterxml.jackson.module.kotlin.kotlinModule
 import com.place.search.applications.LocalSearchService
+import com.place.search.applications.SearchHistoryService
 import com.place.search.domain.converter.LocalSearchConverter
+import com.place.search.domain.repositories.SearchHistoryRepository
 import com.place.search.presentation.external.service.KakaoLocalService
 import com.place.search.presentation.external.service.NaverLocalService
 import io.kotest.core.spec.style.BehaviorSpec
@@ -18,7 +20,8 @@ abstract class AbstractServiceTest: KoinTest, BehaviorSpec({
         startKoin {
             modules(
                 serviceModule,
-                converterModule
+                converterModule,
+                repositoryModule,
             )
         }
     }
@@ -28,9 +31,13 @@ abstract class AbstractServiceTest: KoinTest, BehaviorSpec({
             single { mockk<KakaoLocalService>() }
             single { mockk<NaverLocalService>() }
             singleOf(::LocalSearchService)
+            singleOf(::SearchHistoryService)
         }
         val converterModule = module {
             singleOf(::LocalSearchConverter)
+        }
+        val repositoryModule = module {
+            single { mockk<SearchHistoryRepository>() }
         }
     }
 }

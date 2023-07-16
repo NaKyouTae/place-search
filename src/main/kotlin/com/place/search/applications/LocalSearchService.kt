@@ -1,43 +1,63 @@
 package com.place.search.applications
 
 import com.place.search.domain.converter.LocalSearchConverter
+import com.place.search.presentation.external.response.kakao.KakaoApiResponse
+import com.place.search.presentation.external.response.kakao.KakaoLocalSearchDocumentResponse
+import com.place.search.presentation.external.response.naver.NaverLocalSearchResponse
 import com.place.search.presentation.external.service.KakaoLocalService
 import com.place.search.presentation.external.service.NaverLocalService
 import com.place.search.presentation.internal.request.LocalSearchRequest
 import org.springframework.stereotype.Service
-import java.util.PriorityQueue
+import org.springframework.transaction.annotation.Transactional
 
 @Service
 class LocalSearchService(
     private val kakaoLocalService: KakaoLocalService,
     private val naverLocalService: NaverLocalService,
     private val localSearchConverter: LocalSearchConverter,
+    private val searchHistoryService: SearchHistoryService,
 ) {
 
+    @Transactional
     fun searchLocalByKeyword(request: LocalSearchRequest): List<String> {
-        val kakaoLocalRequest = localSearchConverter.convertToKakao(request)
-        val kakaoResponse = kakaoLocalService.searchPlaceByKakaoApi(kakaoLocalRequest)
-        val naverLocalRequest = localSearchConverter.convertToNaver(request)
-        val naverResponse = naverLocalService.searchPlaceByNaverApi(naverLocalRequest)
+        val naverResponse = searchLocalByNaver(request, SEARCH_API_RESULT_SIZE)
+        val kakaoResponse = searchLocalByKakao(request, SEARCH_API_RESULT_SIZE)
 
-        if(kakaoResponse == null && naverResponse == null) return emptyList()
+        val addNaverResponse = if (kakaoResponse.documents.size < SEARCH_API_RESULT_SIZE) {
+            searchLocalByNaver(request, SEARCH_API_RESULT_SIZE - kakaoResponse.documents.size)
+                .let { naverResponse.copy(items = naverResponse.items + it.items) }
+                .let { localSearchConverter.convertFromNaver(it) }
+        } else emptyList()
 
-        val kakaoLocalSearchResponse = localSearchConverter.convertFromKakao(kakaoResponse)
-        val naverLocalSearchResponse = localSearchConverter.convertFromNaver(naverResponse)
+        val addKakaoResponse = if (naverResponse.items.size < SEARCH_API_RESULT_SIZE) {
+            searchLocalByKakao(request, SEARCH_API_RESULT_SIZE - naverResponse.items.size)
+                .let { kakaoResponse.copy(documents = kakaoResponse.documents + it.documents) }
+                .let { localSearchConverter.convertFromKakao(it) }
+        } else emptyList()
+
+        val kakaoLocalSearchResponse = localSearchConverter.convertFromKakao(kakaoResponse) + addKakaoResponse
+        val naverLocalSearchResponse = localSearchConverter.convertFromNaver(naverResponse) + addNaverResponse
 
         val unionList = kakaoLocalSearchResponse.intersect(naverLocalSearchResponse).toList()
-        val aSub = kakaoLocalSearchResponse.minus(naverLocalSearchResponse).toList()
-        val bSub = naverLocalSearchResponse.minus(kakaoLocalSearchResponse).toList()
+        val kakaoSub = kakaoLocalSearchResponse.minus(naverLocalSearchResponse).toList()
+        val naverSub = naverLocalSearchResponse.minus(kakaoLocalSearchResponse).toList()
 
-        return unionList + aSub + bSub
+        searchHistoryService.trackSearchKeyword(request.query)
+
+        return unionList + kakaoSub + naverSub
     }
 
+    private fun searchLocalByNaver(request: LocalSearchRequest, size: Int): NaverLocalSearchResponse {
+        val localRequest = localSearchConverter.convertToNaver(request, size)
+        return naverLocalService.searchPlaceByNaverApi(localRequest)
+    }
 
-    data class Node(
-        val index : Int,
-        val value : String
-    ) : Comparable<Node> {
-        override fun compareTo(other: Node): Int = index - other.index
+    private fun searchLocalByKakao(request: LocalSearchRequest, size: Int): KakaoApiResponse<KakaoLocalSearchDocumentResponse> {
+        val localRequest = localSearchConverter.convertToKakao(request, size)
+        return kakaoLocalService.searchPlaceByKakaoApi(localRequest)
+    }
 
+    companion object {
+        const val SEARCH_API_RESULT_SIZE = 5
     }
 }

@@ -37,6 +37,8 @@ dependencies {
 	implementation("org.jetbrains.kotlinx:kotlinx-coroutines-reactor")
 	implementation("com.h2database:h2")
 	implementation("io.insert-koin:koin-core:3.4.2")
+	implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.0.2")
+	implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310")
 
 	compileOnly("org.projectlombok:lombok")
 
