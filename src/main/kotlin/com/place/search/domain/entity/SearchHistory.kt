@@ -9,7 +9,13 @@ import jakarta.persistence.Table
 import org.hibernate.annotations.GenericGenerator
 
 @Entity
-@Table(name = "kb_tb_search_history", indexes = [Index(name = "idx_keyword", columnList = "keyword", unique = true)])
+@Table(
+    name = "kb_tb_search_history",
+    indexes = [
+        Index(name = "idx_keyword", columnList = "keyword", unique = true),
+        Index(name = "idx_views", columnList = "views"),
+    ]
+)
 data class SearchHistory(
     @Id
     @GeneratedValue(generator = "stringIDGenerator")
@@ -22,4 +28,4 @@ data class SearchHistory(
 
     @Column(nullable = false)
     var views: Long, // 검색 수
-): AuditingEntity()
+) : AuditingEntity()
