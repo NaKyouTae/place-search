@@ -7,8 +7,11 @@ import com.place.search.presentation.external.response.naver.NaverLocalSearchRes
 import com.place.search.presentation.external.service.KakaoLocalService
 import com.place.search.presentation.external.service.NaverLocalService
 import com.place.search.presentation.internal.request.LocalSearchRequest
+import org.springframework.dao.CannotAcquireLockException
+import org.springframework.dao.DataIntegrityViolationException
+import org.springframework.retry.annotation.Backoff
+import org.springframework.retry.annotation.Retryable
 import org.springframework.stereotype.Service
-import org.springframework.transaction.annotation.Transactional
 
 @Service
 class LocalSearchService(
@@ -18,7 +21,11 @@ class LocalSearchService(
     private val searchHistoryService: SearchHistoryService,
 ) {
 
-    @Transactional
+    @Retryable(
+        value = [DataIntegrityViolationException::class, CannotAcquireLockException::class],
+        maxAttempts = 3,
+        backoff = Backoff(delay = 1000, maxDelay = 5000)
+    )
     fun searchLocalByKeyword(request: LocalSearchRequest): List<String> {
         val naverResponse = searchLocalByNaver(request, SEARCH_API_RESULT_SIZE)
         val kakaoResponse = searchLocalByKakao(request, SEARCH_API_RESULT_SIZE)

@@ -39,6 +39,8 @@ dependencies {
 	implementation("io.insert-koin:koin-core:3.4.2")
 	implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.0.2")
 	implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310")
+	implementation("org.springframework.retry:spring-retry")
+	implementation("org.springframework:spring-aspects")
 
 	compileOnly("org.projectlombok:lombok")
 

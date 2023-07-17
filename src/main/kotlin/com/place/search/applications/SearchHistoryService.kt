@@ -3,13 +3,14 @@ package com.place.search.applications
 import com.place.search.domain.entity.SearchHistory
 import com.place.search.domain.repositories.SearchHistoryRepository
 import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Isolation
 import org.springframework.transaction.annotation.Transactional
 
 @Service
 class SearchHistoryService(
     private val searchHistoryRepository: SearchHistoryRepository,
 ) {
-    @Transactional
+    @Transactional(isolation = Isolation.SERIALIZABLE)
     fun trackSearchKeyword(keyword: String) {
         val searchHistory = searchHistoryRepository.findByKeyword(keyword)
 
